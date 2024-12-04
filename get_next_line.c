@@ -6,7 +6,7 @@
 /*   By: makamins <makamins@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/21 15:26:25 by makamins          #+#    #+#             */
-/*   Updated: 2024/12/04 14:37:59 by makamins         ###   ########.fr       */
+/*   Updated: 2024/12/04 17:24:13 by makamins         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,21 +18,21 @@ char	*read_first_line(int fd, char *buffer, char *line)
 	char	*temporary;	
 
 	read_line = 1;
-	if (!line)
-		line = ft_strdup("");
-	while (read_line > 0)
+	while (read_line != 0)
 	{
 		read_line = read(fd, buffer, BUFFER_SIZE);
-		if (read_line == -1)
-			return (NULL);
+		if (read_line < 0)
+			break ;
 		buffer[read_line] = '\0';
+		if (!line)
+			line = ft_strdup("");
 		temporary = line;
 		line = ft_strjoin(temporary, buffer);
 		free(temporary);
 		if (ft_strchr(buffer, '\n'))
-			return (line);
+			break ;
 	}
-	if (read_line == 0 && *line == '\0')
+	if ((read_line == 0 && *line == '\0') || read_line < 0)
 	{
 		free(line);
 		return (NULL);
@@ -84,7 +84,7 @@ char	*get_next_line(int fd)
 	char		*buffer;
 	char		*line;
 
-	if (fd == -1 || BUFFER_SIZE <= 0)
+	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
 	buffer = malloc(BUFFER_SIZE + 1);
 	if (!buffer)
@@ -97,6 +97,7 @@ char	*get_next_line(int fd)
 	if (!line)
 	{
 		free(rest);
+		rest = NULL;
 		return (NULL);
 	}
 	rest = update_rest(rest);
